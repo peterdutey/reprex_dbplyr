@@ -1,0 +1,41 @@
+---
+title: "testdplyr"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+ 
+```{r will_error}
+packageVersion("DBI")
+packageVersion("RSQLite")
+packageVersion("dbplyr")
+packageVersion("dplyr")
+temp_db <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+dbplyr::db_copy_to(
+  con = temp_db,
+  table = "mydata",
+  values = data.frame(data=1:5),
+  overwrite = TRUE,
+  temporary = FALSE
+)
+try({dbplyr::db_copy_to(
+  con = temp_db,
+  table = "mydata",
+  values = data.frame(data=6:10),
+  overwrite = TRUE,
+  temporary = FALSE
+)})
+```
+
+
+```{r will_work}
+DBI::dbWriteTable(
+  conn = temp_db,
+  name = "mydata",
+  value = data.frame(data=6:10),
+  overwrite = TRUE,
+  temporary = FALSE
+)
+```
+ 
